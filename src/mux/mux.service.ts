@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Mux from "@mux/mux-node";
+const Mux = require("@mux/mux-node");
 import { Video } from '@mux/mux-node/dist/video/video';
+import { ISpace } from './types';
 
 @Injectable()
 export class MuxService {
@@ -35,7 +36,7 @@ export class MuxService {
     }
   };
 
-  retrieveLiveStreams = async (data, context) => {
+  getLiveStreams = async () => {
     try {
       const liveStreams = await this.Video.LiveStreams.list({});
 
@@ -58,15 +59,14 @@ export class MuxService {
     }
   };
 
-  retrieveLiveStream = async (data, context) => {
+  getLiveStream = async (liveStreamId) => {
     try {
-      const liveStreamId = data.liveStreamId;
       const liveStream = await this.Video.LiveStreams.get(liveStreamId);
 
       return liveStream;
     } catch (err) {
       console.error(
-        `Unable to retrieve live stream, id: ${data.liveStreamId}. 
+        `Unable to retrieve live stream, id: ${liveStreamId}. 
         Error ${err}`,
       );
       throw new Error(
@@ -75,15 +75,14 @@ export class MuxService {
     }
   };
 
-  deleteLiveStream = async (data, context) => {
+  deleteLiveStream = async (liveStreamId) => {
     try {
-      const liveStreamId = data.liveStreamId;
       const response = await this.Video.LiveStreams.del(liveStreamId);
 
       return response;
     } catch (err) {
       console.error(
-        `Unable to delete live stream, id: ${data.liveStreamId}. 
+        `Unable to delete live stream, id: ${liveStreamId}. 
       Error ${err}`,
       );
       throw new Error(
@@ -92,7 +91,9 @@ export class MuxService {
     }
   };
 
-  createSpaceWithBroadcast = async (data, context) => {
+  getJWTBySpaceId = (spaceId: string) => Mux.JWT.signSpaceId(spaceId);
+
+  createSpaceWithBroadcast = async (): Promise<ISpace> => {
     try {
       const space = await this.Video.Spaces.create({});
 
@@ -109,17 +110,16 @@ export class MuxService {
         // resolution?: BroadcastResolution;
       });
 
-      const spaceToken = Mux.JWT.signSpaceId(space.id);
+      // const spaceToken = Mux.JWT.signSpaceId(space.id);
 
       return {
-        spaceToken,
         spaceId: space.id,
         liveStreamId: liveStream.id,
         broadcastId: broadcast.id
       };
     } catch (err) {
       console.error(
-        `Unable to create space ${context.auth.uid}. Error ${err}`,
+        `Unable to create space. Error ${err}`,
       );
 
       throw new Error(

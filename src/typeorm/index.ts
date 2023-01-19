@@ -1,8 +1,9 @@
 import { StripeCheckoutSession } from './stripe.request.entity';
 import { Subscriptions } from './subscription.entity';
 import { Payments } from './payments.entity';
+import { LiveStreams } from './live-streams.entity';
 
-const entities = [StripeCheckoutSession, Subscriptions, Payments];
+const entities = [LiveStreams];
 
-export { StripeCheckoutSession, Subscriptions, Payments };
+export { LiveStreams, StripeCheckoutSession, Subscriptions, Payments };
 export default entities;
