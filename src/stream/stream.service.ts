@@ -7,27 +7,43 @@ import { StreamCreateDto } from './dto/stream.create.dto';
 
 @Injectable()
 export class StreamService {
+  private muxLiveStreams = [];
+
   constructor(
     private readonly muxService: MuxService,
 
     @InjectRepository(LiveStreams)
     private liveStreamsRep: Repository<LiveStreams>,
   ) {
-
+    setInterval(async () => {
+      this.muxLiveStreams = await this.muxService.getLiveStreams();
+    }, 5000);
   }
 
   async getLiveStreams() {
     const dbStrreams = await this.liveStreamsRep.find();
 
-    return dbStrreams;
+    return dbStrreams.map(dbStream => {
+      const muxLiveStream = this.muxLiveStreams.find(stream => stream.id === dbStream.liveStreamId);
 
-    // return this.muxService.getLiveStreams();
+      return {
+        ...dbStream,
+        status: muxLiveStream?.status,
+        playbackId: muxLiveStream?.playback_ids[0]?.id
+      }
+    });
   }
 
   async getLiveStream(id: number) {
-    const dbStrream = await this.liveStreamsRep.findOneBy({ id });
+    const dbStream = await this.liveStreamsRep.findOneBy({ id });
 
-    return dbStrream;
+    const muxLiveStream = this.muxLiveStreams.find(stream => stream.id === dbStream.liveStreamId);
+
+    return {
+      ...dbStream,
+      status: muxLiveStream?.status,
+      playbackId: muxLiveStream?.playback_ids[0]?.id
+    };
   }
 
   async getLiveStreamToken(id: number) {
