@@ -70,7 +70,7 @@ export class StreamService {
   }
 
   async startLiveStream(liveStreamId: number) {
-    const stream = this.getLiveStream(liveStreamId);
+    const stream = await this.getLiveStream(liveStreamId);
 
     return this.muxService.startBroadcast(stream);
   }
