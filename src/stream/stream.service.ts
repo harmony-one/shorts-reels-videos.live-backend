@@ -68,4 +68,10 @@ export class StreamService {
   async deleteLiveStream(liveStreamId: string) {
     return this.muxService.deleteLiveStream(liveStreamId);
   }
+
+  async startLiveStream(liveStreamId: number) {
+    const stream = this.getLiveStream(liveStreamId);
+
+    return this.muxService.startBroadcast(stream);
+  }
 }

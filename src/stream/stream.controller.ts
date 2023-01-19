@@ -38,6 +38,11 @@ export class StreamController {
     return this.streamService.getLiveStreamToken(streamId);
   }
 
+  @Post('/:id/start')
+  async startLiveStream(@Param('id') streamId) {
+    return this.streamService.startLiveStream(streamId);
+  }
+
   @Post('/:id/delete')
   async deleteLiveStream(@Param('id') streamId) {
     return this.streamService.deleteLiveStream(streamId);

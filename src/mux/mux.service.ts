@@ -128,14 +128,14 @@ export class MuxService {
     }
   };
 
-  startBroadcast = async (data, context) => {
+  startBroadcast = async (data) => {
     try {
       const response = await this.Video.Spaces.Broadcasts.start(data.spaceId, data.broadcastId);
 
       return response;
     } catch (err) {
       console.error(
-        `Unable to start broadcast ${context.auth.uid}. Error ${err}`,
+        `Unable to start broadcast. Error ${err}`,
       );
 
       throw new Error(
