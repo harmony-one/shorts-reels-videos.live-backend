@@ -17,7 +17,7 @@ export class StreamService {
   ) {
     setInterval(async () => {
       this.muxLiveStreams = await this.muxService.getLiveStreams();
-    }, 5000);
+    }, 3000);
   }
 
   async getLiveStreams() {
@@ -65,8 +65,24 @@ export class StreamService {
     return await this.liveStreamsRep.save(liveStreamData);
   }
 
-  async deleteLiveStream(liveStreamId: string) {
-    return this.muxService.deleteLiveStream(liveStreamId);
+  async deleteLiveStream(id: number) {
+    const stream = await this.getLiveStream(id);
+
+    try {
+      await this.muxService.deleteLiveStream(stream.liveStreamId);
+    } catch (e) {
+      console.error(e);
+    }
+
+    try {
+      await this.muxService.deleteSpace(stream.spaceId);
+    } catch (e) {
+      console.error(e);
+    }
+
+    const dbStrream = await this.liveStreamsRep.findOneBy({ id });
+
+    return await this.liveStreamsRep.delete(dbStrream);
   }
 
   async startLiveStream(liveStreamId: number) {

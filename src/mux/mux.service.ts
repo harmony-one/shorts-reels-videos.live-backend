@@ -135,11 +135,11 @@ export class MuxService {
       return response;
     } catch (err) {
       console.error(
-        `Unable to start broadcast. Error ${err}`,
+        `Unable to start broadcast. Error ${err.message}`,
       );
 
       throw new Error(
-        "Could not start broadcast",
+        err.message,
       );
     }
   };
@@ -160,14 +160,14 @@ export class MuxService {
     }
   };
 
-  deleteSpace = async (data, context) => {
+  deleteSpace = async (spaceId) => {
     try {
-      const response = await this.Video.Spaces.delete(data.spaceId);
+      const response = await this.Video.Spaces.delete(spaceId);
 
       return response;
     } catch (err) {
       console.error(
-        `Unable to delete space ${context.auth.uid}. Error ${err}`,
+        `Unable to delete space. Error ${err}`,
       );
 
       throw new Error(
