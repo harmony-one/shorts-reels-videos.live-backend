@@ -12,6 +12,8 @@ export default () => ({
   },
   web3: {
     rpcUrl: process.env.RPC_URL || 'https://api.s0.t.hmny.io',
+    subscriptionsContractAddress: process.env.SUBSCRIPTIONS_CONTRACT_ADDRESS ||
+      '0xaef596d26be185d1c25c0aadfab6ab054e7c011f',
     oneCountryContractAddress:
       process.env.ONE_COUNTRY_CONTRACT_ADDRESS ||
       '0xaef596d26be185d1c25c0aadfab6ab054e7c011f',

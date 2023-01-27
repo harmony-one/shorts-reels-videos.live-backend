@@ -19,12 +19,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@harmony-js/crypto": "^0.1.56",
+    "@mux/mux-node": "^7.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.4",
     "@nestjs/typeorm": "^9.0.1",
+    "axios": "^1.2.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "one-country-sdk": "^0.3.0",
@@ -34,8 +37,7 @@
     "stripe": "^11.5.0",
     "typeorm": "^0.3.11",
     "uuid": "^9.0.0",
-    "web3": "^1.8.1",
-    "@mux/mux-node": "^7.0.0"
+    "web3": "^1.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

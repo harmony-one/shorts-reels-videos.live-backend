@@ -10,6 +10,7 @@ import { Web3Service } from './web3/web3.service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { StreamModule } from './stream/stream.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { StreamModule } from './stream/stream.module';
       inject: [ConfigService],
     }),
     Web3Module,
-    StreamModule
+    StreamModule,
+    SubscriptionModule
   ],
   controllers: [AppController, UserController],
   providers: [AppService, Web3Service, UserService],
