@@ -49,15 +49,18 @@ export class SubscriptionService {
   }
 
   getPaymentLink = async (props: {
-    amount: string;
+    amount: number;
     params: {
       user: string;
       name: string;
       aliasName: string;
+      paidAt: number;
     }
     successUrl: string;
     cancelUrl: string;
   }) => {
+    console.log(`${this.configService.get('paymentService.url')}/stripe/checkout/video/pay`, props);
+
     const res = await axios.post(
       `${this.configService.get('paymentService.url')}/stripe/checkout/video/pay`,
       props

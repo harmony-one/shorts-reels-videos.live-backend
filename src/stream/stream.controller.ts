@@ -5,12 +5,14 @@ import {
   Logger,
   Param,
   Post,
-  Query
+  Query,
+  Req
 } from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { ApiTags } from '@nestjs/swagger';
 import { StreamCreateDto } from './dto/stream.create.dto';
 import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('streams')
 @Controller('streams')
@@ -19,6 +21,7 @@ export class StreamController {
   constructor(
     private readonly streamService: StreamService,
     private readonly subscriptionService: SubscriptionService,
+    private configService: ConfigService,
   ) { }
 
   @Post('/create')
@@ -34,6 +37,9 @@ export class StreamController {
       id: l.id,
       status: l.status,
       title: l.title,
+      name: l.name,
+      aliasName: l.aliasName,
+      ownerAddress: l.ownerAddress,
       createdAt: l.createdAt,
       updatedAt: l.updatedAt,
     }));
@@ -48,7 +54,7 @@ export class StreamController {
     if (stream) {
       try {
         hasSubscription = await this.subscriptionService.checkUserSubscription({
-          user: query.user,
+          user: query.address,
           name: stream.name,
           aliasName: stream.aliasName
         });
@@ -61,11 +67,31 @@ export class StreamController {
       id: stream.id,
       status: stream.status,
       title: stream.title,
+      name: stream.name,
+      aliasName: stream.aliasName,
+      ownerAddress: stream.ownerAddress,
       createdAt: stream.createdAt,
       updatedAt: stream.updatedAt,
       hasSubscription,
       playbackId: hasSubscription ? stream.playbackId : null,
     })
+  }
+
+  @Post('/:id/pay')
+  async getPaymentLink(@Param('id') streamId, @Body() body, @Req() req: any) {
+    const stream = await this.streamService.getLiveStream(streamId);
+
+    return this.subscriptionService.getPaymentLink({
+      amount: 50,
+      params: {
+        user: body.address,
+        name: stream.name,
+        aliasName: stream.aliasName,
+        paidAt: 12345,
+      },
+      successUrl: `${this.configService.get('frontend.url')}/streams/${streamId}`,
+      cancelUrl: `${this.configService.get('frontend.url')}/streams/${streamId}/rejected`
+    });
   }
 
   @Get('/:id/token')

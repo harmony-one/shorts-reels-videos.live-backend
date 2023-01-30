@@ -21,6 +21,9 @@ export default () => ({
   paymentService: {
     url: 'https://stripe-payments-backend.fly.dev'
   },
+  frontend: {
+    url: process.env.CLIENT_URL
+  },
   version: process.env.npm_package_version || '0.0.1',
   name: process.env.npm_package_name || '',
   port: parseInt(process.env.PORT, 10) || 8080,
