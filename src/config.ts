@@ -18,6 +18,9 @@ export default () => ({
       process.env.ONE_COUNTRY_CONTRACT_ADDRESS ||
       '0xaef596d26be185d1c25c0aadfab6ab054e7c011f',
   },
+  paymentService: {
+    url: 'https://stripe-payments-backend.fly.dev'
+  },
   version: process.env.npm_package_version || '0.0.1',
   name: process.env.npm_package_name || '',
   port: parseInt(process.env.PORT, 10) || 8080,

@@ -34,6 +34,16 @@ export class LiveStreams {
   @Column({
     type: 'varchar',
   })
+  name: string;
+
+  @Column({
+    type: 'varchar',
+  })
+  aliasName: string;
+
+  @Column({
+    type: 'varchar',
+  })
   ownerAddress: string;
 
   @CreateDateColumn({ name: 'created_at' })
