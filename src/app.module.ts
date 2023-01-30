@@ -4,19 +4,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import configuration from './config';
-import { Web3Module } from './web3/web3.module';
 import entities from './typeorm';
-import { Web3Service } from './web3/web3.service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { StreamModule } from './stream/stream.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { Web3Module } from 'nest-web3';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
+    }),
+    Web3Module.forRootAsync({
+      useFactory: (configService: ConfigService) => configService.get('web3'),
+      inject: [ConfigService]
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -37,6 +40,6 @@ import { SubscriptionModule } from './subscription/subscription.module';
     SubscriptionModule
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, Web3Service, UserService],
+  providers: [AppService, UserService],
 })
 export class AppModule { }
