@@ -1,13 +1,14 @@
-import Web3 from 'web3';
 import { AbiItem } from 'web3-utils/types';
-import { 
-  getContractDeploymentBlock, 
-  getEventsAbi, 
+import { Web3Service } from "nest-web3";
+import Web3 from 'web3';
+import {
+  getContractDeploymentBlock,
+  getEventsAbi,
   getHmyLogs,
 } from './api';
 
 import EventEmitter = require('events');
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 export interface IEvent {
   address: string;
@@ -31,6 +32,7 @@ export interface IEventTrackerService {
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
+@Injectable()
 export class EventTrackerService {
   private readonly logger = new Logger(EventTrackerService.name);
   dbCollectionPrefix = '';
@@ -57,9 +59,11 @@ export class EventTrackerService {
 
   rpcUrl;
 
-  constructor(params: IEventTrackerService) {
-    this.rpcUrl = params.rpcUrl;
-    this.web3 = new Web3(this.rpcUrl);
+  constructor(
+    params: IEventTrackerService,
+    private readonly web3Service: Web3Service
+  ) {
+    this.web3 = this.web3Service.getClient();
 
     this.contractAddress = params.contractAddress;
     this.abiEvents = getEventsAbi(this.web3, params.contractAbi);
