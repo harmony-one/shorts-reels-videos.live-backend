@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MuxService } from 'src/mux/mux.service';
 import { LiveStreams } from 'src/typeorm';
+import { Likes } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { StreamCreateDto } from './dto/stream.create.dto';
 
@@ -14,6 +15,9 @@ export class StreamService {
 
     @InjectRepository(LiveStreams)
     private liveStreamsRep: Repository<LiveStreams>,
+
+    @InjectRepository(Likes)
+    private likesRep: Repository<Likes>,
   ) {
     setInterval(async () => {
       this.muxLiveStreams = await this.muxService.getLiveStreams();
@@ -34,15 +38,33 @@ export class StreamService {
     });
   }
 
-  async getLiveStream(id: number) {
+  async getLiveStream(id: number, userAddress?: string) {
     const dbStream = await this.liveStreamsRep.findOneBy({ id });
 
     const muxLiveStream = this.muxLiveStreams.find(stream => stream.id === dbStream.liveStreamId);
 
+    let liked = false;
+
+    if (userAddress) {
+      try {
+        liked = !!(await this.likesRep.findOneBy({ streamId: id, userAddress }));
+      } catch (e) { }
+    }
+
+    let totalLikes = 0;
+    
+    try {
+    totalLikes = await this.likesRep.count({ where: { streamId: id } });
+    } catch (e) {
+      // console.error(e);
+    }
+
     return {
       ...dbStream,
       status: muxLiveStream?.status,
-      playbackId: muxLiveStream?.playback_ids[0]?.id
+      playbackId: muxLiveStream?.playback_ids[0]?.id,
+      liked,
+      totalLikes
     };
   }
 
@@ -89,5 +111,14 @@ export class StreamService {
     const stream = await this.getLiveStream(liveStreamId);
 
     return this.muxService.startBroadcast(stream);
+  }
+
+  async likeLiveStream(streamId: number, userAddress: string) {
+    return await this.likesRep.save({
+      streamId,
+      userAddress,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
   }
 }

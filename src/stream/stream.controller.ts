@@ -47,7 +47,7 @@ export class StreamController {
 
   @Get('/:id')
   async getLiveStream(@Param('id') streamId, @Query() query: any) {
-    const stream = await this.streamService.getLiveStream(streamId);
+    const stream = await this.streamService.getLiveStream(streamId, query.address);
 
     let hasSubscription = false;
 
@@ -63,6 +63,8 @@ export class StreamController {
       }
     }
 
+    hasSubscription = true;
+
     return ({
       id: stream.id,
       status: stream.status,
@@ -74,6 +76,8 @@ export class StreamController {
       updatedAt: stream.updatedAt,
       hasSubscription,
       playbackId: hasSubscription ? stream.playbackId : null,
+      liked: stream.liked,
+      totalLikes: stream.totalLikes
     })
   }
 
@@ -97,6 +101,16 @@ export class StreamController {
   @Get('/:id/token')
   async getLiveStreamToken(@Param('id') streamId) {
     return this.streamService.getLiveStreamToken(streamId);
+  }
+
+  // @Get('/:id/get-chat-user')
+  // async startLiveStream(@Param('id') streamId) {
+  //   return this.streamService.startLiveStream(streamId);
+  // }
+
+  @Post('/:id/like')
+  async likeLiveStream(@Param('id') streamId, @Query() query: any) {
+    return this.streamService.likeLiveStream(streamId, query.address);
   }
 
   @Post('/:id/start')
