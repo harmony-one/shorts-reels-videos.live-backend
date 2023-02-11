@@ -11,4 +11,14 @@ export class StreamCreateDto {
     @IsString()
     @IsNotEmpty()
     title: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    aliasName: string;
 }
