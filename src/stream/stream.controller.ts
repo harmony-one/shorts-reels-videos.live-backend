@@ -12,6 +12,7 @@ import { StreamService } from './stream.service';
 import { ApiTags } from '@nestjs/swagger';
 import { StreamCreateDto } from './dto/stream.create.dto';
 import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ChatService } from 'src/chat/chat.service';
 import { ConfigService } from '@nestjs/config';
 
 @ApiTags('streams')
@@ -21,12 +22,42 @@ export class StreamController {
   constructor(
     private readonly streamService: StreamService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly chatService: ChatService,
     private configService: ConfigService,
   ) { }
 
   @Post('/create')
   async createLiveStream(@Body() streamCreateDto: StreamCreateDto) {
-    return this.streamService.createLiveStream(streamCreateDto);
+    const stream = await this.streamService.createLiveStream(streamCreateDto);
+
+    await this.chatService.createChannel(stream.ownerAddress, stream.id);
+
+    return stream;
+  }
+
+  @Get('/chat/keys')
+  async getChatKeys(@Query() query: any) {
+    return {
+      apiKey: this.chatService.getApiKey(),
+      userToken: this.chatService.getUserToken(query.address),
+    }
+  }
+
+  @Post('/:id/join-chat')
+  async addUserToChat(@Param('id') streamId, @Query() query: any) {
+    await this.chatService.addUserToChannel(query.address, streamId);
+
+    return true;
+  }
+
+  @Post('/chat/create-user')
+  async createChatUser(@Query() query: any) {
+    await this.chatService.createUser(query.address, query.address);
+
+    return {
+      apiKey: this.chatService.getApiKey(),
+      userToken: this.chatService.getUserToken(query.address),
+    }
   }
 
   @Get('/list')

@@ -5,18 +5,21 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class ChatService {
     chatSDK: StreamChat;
+    apiKey: string;
 
     constructor(private configService: ConfigService) {
         this.chatSDK = StreamChat.getInstance(
             configService.get('streamChat.apiKey'),
             configService.get('streamChat.apiSecret'),
         );
+
+        this.apiKey = configService.get('streamChat.apiKey');
     }
 
-    getUserToken = async (user) => {
+    getUserToken = (user) => {
         const token = this.chatSDK.createToken(
             user,
-            Math.floor(Date.now() / 1000) + (60 * 60)
+            Math.floor(Date.now() / 1000) + (60 * 60 * 100)
         );
 
         return token;
@@ -44,4 +47,6 @@ export class ChatService {
     createUser = async (id, name) => {
         return await this.chatSDK.upsertUser({ id, name });
     }
+
+    getApiKey = () => this.apiKey;
 }
