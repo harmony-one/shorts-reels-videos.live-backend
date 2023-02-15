@@ -24,6 +24,10 @@ export default () => ({
   frontend: {
     url: process.env.CLIENT_URL
   },
+  streamChat: {
+    apiKey: process.env.STREAM_CHAT_API_KEY,
+    apiSecret: process.env.STREAM_CHAT_API_SECRET,
+  },
   version: process.env.npm_package_version || '0.0.1',
   name: process.env.npm_package_name || '',
   port: parseInt(process.env.PORT, 10) || 8080,

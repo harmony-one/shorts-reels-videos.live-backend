@@ -53,9 +53,9 @@ export class MuxService {
         `Unable to retrieve live streams. 
         Error ${err}`,
       );
-      throw new Error(
-        "Could not retrieve live streams",
-      );
+      // throw new Error(
+      //   "Could not retrieve live streams",
+      // );
     }
   };
 
