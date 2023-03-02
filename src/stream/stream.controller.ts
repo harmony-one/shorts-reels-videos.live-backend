@@ -3,10 +3,12 @@ import {
   Controller,
   Get,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
-  Req
+  Req,
+  Res
 } from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -43,9 +45,11 @@ export class StreamController {
     }
   }
 
-  @Post('/:id/join-chat')
-  async addUserToChat(@Param('id') streamId, @Query() query: any) {
-    await this.chatService.addUserToChannel(query.address, streamId);
+  @Post('/:name/join-chat')
+  async addUserToChat(@Param('name') name, @Query() query: any) {
+    const stream = await this.streamService.getLiveStreamByName(name);
+
+    await this.chatService.addUserToChannel(query.address, stream.id);
 
     return true;
   }
@@ -76,9 +80,15 @@ export class StreamController {
     }));
   }
 
-  @Get('/:id')
-  async getLiveStream(@Param('id') streamId, @Query() query: any) {
-    const stream = await this.streamService.getLiveStream(streamId, query.address);
+  @Get('/:name')
+  async getLiveStream(@Param('name') name, @Query() query: any) {
+    const dbStream = await this.streamService.getLiveStreamByName(name);
+
+    if (!dbStream) {
+      throw new NotFoundException('Stream Not Found')
+    }
+
+    const stream = await this.streamService.getLiveStream(dbStream.id, query.address);
 
     let hasSubscription = false;
 
@@ -112,9 +122,9 @@ export class StreamController {
     })
   }
 
-  @Post('/:id/pay')
-  async getPaymentLink(@Param('id') streamId, @Body() body, @Req() req: any) {
-    const stream = await this.streamService.getLiveStream(streamId);
+  @Post('/:name/pay')
+  async getPaymentLink(@Param('name') name, @Body() body, @Req() req: any) {
+    const stream = await this.streamService.getLiveStreamByName(name);
 
     return this.subscriptionService.getPaymentLink({
       amount: 50,
@@ -124,33 +134,41 @@ export class StreamController {
         aliasName: stream.aliasName,
         paidAt: 12345,
       },
-      successUrl: `${this.configService.get('frontend.url')}/streams/${streamId}`,
-      cancelUrl: `${this.configService.get('frontend.url')}/streams/${streamId}/rejected`
+      successUrl: `${this.configService.get('frontend.url')}/streams/${stream?.id}`,
+      cancelUrl: `${this.configService.get('frontend.url')}/streams/${stream?.id}/rejected`
     });
   }
 
-  @Get('/:id/token')
-  async getLiveStreamToken(@Param('id') streamId) {
-    return this.streamService.getLiveStreamToken(streamId);
+  @Get('/:name/token')
+  async getLiveStreamToken(@Param('name') name) {
+    const stream = await this.streamService.getLiveStreamByName(name);
+
+    return this.streamService.getLiveStreamToken(stream?.id);
   }
 
-  // @Get('/:id/get-chat-user')
-  // async startLiveStream(@Param('id') streamId) {
+  // @Get('/:name/get-chat-user')
+  // async startLiveStream(@Param('name') name) {
   //   return this.streamService.startLiveStream(streamId);
   // }
 
-  @Post('/:id/like')
-  async likeLiveStream(@Param('id') streamId, @Query() query: any) {
-    return this.streamService.likeLiveStream(streamId, query.address);
+  @Post('/:name/like')
+  async likeLiveStream(@Param('name') name, @Query() query: any) {
+    const stream = await this.streamService.getLiveStreamByName(name);
+
+    return this.streamService.likeLiveStream(stream?.id, query.address);
   }
 
-  @Post('/:id/start')
-  async startLiveStream(@Param('id') streamId) {
-    return this.streamService.startLiveStream(streamId);
+  @Post('/:name/start')
+  async startLiveStream(@Param('name') name) {
+    const stream = await this.streamService.getLiveStreamByName(name);
+
+    return this.streamService.startLiveStream(stream?.id);
   }
 
-  @Post('/:id/delete')
-  async deleteLiveStream(@Param('id') streamId) {
-    return this.streamService.deleteLiveStream(streamId);
+  @Post('/:name/delete')
+  async deleteLiveStream(@Param('name') name) {
+    const stream = await this.streamService.getLiveStreamByName(name);
+
+    return this.streamService.deleteLiveStream(stream?.id);
   }
 }
