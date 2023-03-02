@@ -121,4 +121,10 @@ export class StreamService {
       updatedAt: new Date()
     });
   }
+
+  async getLiveStreamByName(name, aliasName = 'live') {
+    const dbStream = await this.liveStreamsRep.findOneBy({ name, aliasName });
+
+    return dbStream;
+  }
 }
